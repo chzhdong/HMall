@@ -11,6 +11,12 @@
     <modules>
         <module>hm-common</module>
         <module>hm-service</module>
+        <module>hm-api</module>
+        <module>item-service</module>
+        <module>cart-service</module>
+        <module>trade-service</module>
+        <module>user-service</module>
+        <module>pay-service</module>
     </modules>
 
     <parent>
@@ -44,7 +50,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!--spring cloud alibaba-->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>

@@ -51,7 +51,7 @@ public class CookieBuilder {
         cookie.setHttpOnly(httpOnly);
         cookie.setMaxAge(maxAge);
         cookie.setPath(path);
-        log.debug("生成cookie，编码方式:{}，【{}={}，domain:{};maxAge={};path={};httpOnly={}】",
+        log.debug("生成cookie，编码方式:{}，【{}={}，com.hmall.trade.domain:{};maxAge={};path={};httpOnly={}】",
                 charset.name(), name, value, domain, maxAge, path, httpOnly);
         response.addCookie(cookie);
     }
