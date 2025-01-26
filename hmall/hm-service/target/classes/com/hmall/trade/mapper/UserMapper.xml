@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE com.hmall.trade.mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-com.hmall.trade.mapper.dtd">
-<com.hmall.trade.mapper namespace="com.hmall.com.hmall.trade.mapper.UserMapper">
-
-</com.hmall.trade.mapper>
