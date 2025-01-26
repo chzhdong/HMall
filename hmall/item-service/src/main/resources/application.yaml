@@ -7,6 +7,9 @@ spring:
     nacos:
       discovery:
         server-addr: ${hm.db.host}:8848
+      config:
+        import-check:
+          enabled: false
   profiles:
     active: dev
   datasource:

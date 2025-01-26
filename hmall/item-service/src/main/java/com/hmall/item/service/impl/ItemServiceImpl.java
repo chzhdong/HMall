@@ -1,5 +1,6 @@
 package com.hmall.item.service.impl;
 
+import cn.hutool.core.thread.ThreadUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.api.dto.OrderDetailDTO;
 import com.hmall.common.exception.BizIllegalException;
@@ -26,7 +27,7 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements II
 
     @Override
     public void deductStock(List<OrderDetailDTO> items) {
-        String sqlStatement = "com.hmall.item.com.hmall.trade.mapper.ItemMapper.updateStock";
+        String sqlStatement = "com.hmall.item.mapper.ItemMapper.updateStock";
         boolean r = false;
         try {
             r = executeBatch(items, (sqlSession, entity) -> sqlSession.update(sqlStatement, entity));

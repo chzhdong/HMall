@@ -4,6 +4,9 @@ spring:
   application:
     name: cart-service
   cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8090
     nacos:
       discovery:
         server-addr: ${hm.db.host}:8848
@@ -48,4 +51,6 @@ knife4j:
           - com.hmall.cart.controller
 feign:
   okhttp:
+    enabled: true
+  sentinel:
     enabled: true
