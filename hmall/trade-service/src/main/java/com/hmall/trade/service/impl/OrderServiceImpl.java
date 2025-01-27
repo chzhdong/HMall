@@ -14,6 +14,8 @@ import com.hmall.trade.mapper.OrderMapper;
 import com.hmall.trade.service.IOrderDetailService;
 import com.hmall.trade.service.IOrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hmall.api.client.ItemClient;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
  * @author 虎哥
  * @since 2023-05-05
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
@@ -40,6 +43,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final ItemClient itemClient;
     private final CartClient cartClient;
     private final IOrderDetailService detailService;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     @Transactional
@@ -75,7 +79,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         detailService.saveBatch(details);
 
         // 3.清理购物车商品
-        cartClient.deleteCartItemByIds(itemIds);
+        try{
+            rabbitTemplate.convertAndSend("trade.topic", "order.create" ,itemIds);
+        } catch (Exception e) {
+            log.error("清除购物车商品失败，商品ID：{}", itemIds);
+        }
+        // cartClient.deleteCartItemByIds(itemIds);
 
         // 4.扣减库存
         try {

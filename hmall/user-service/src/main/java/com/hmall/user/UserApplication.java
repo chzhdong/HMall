@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @MapperScan("com.hmall.user.mapper")
-@EnableFeignClients
+@EnableFeignClients("com.hmall.api.client")
 @EnableDiscoveryClient
 @SpringBootApplication
 public class UserApplication {

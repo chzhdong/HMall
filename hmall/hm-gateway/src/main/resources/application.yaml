@@ -1,12 +1,10 @@
 server:
   port: 8080
 spring:
-  application:
-    name: gateway
   cloud:
     nacos:
       discovery:
-        server-addr: ${hm.db.host}:8848
+        server-addr: 101.37.25.226:8848
       config:
         import-check:
           enabled: false

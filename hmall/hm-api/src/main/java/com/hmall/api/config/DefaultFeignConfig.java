@@ -1,12 +1,16 @@
 package com.hmall.api.config;
 
-import com.hmall.api.client.feedback.ItemClientFallbackFactory;
+import com.hmall.api.client.fallback.ItemClientFallback;
 import com.hmall.common.utils.UserContext;
 import feign.Logger;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
+@Component
+@Configuration
 public class DefaultFeignConfig {
     @Bean
     public Logger.Level feignLoggerLevel() {
@@ -29,8 +33,7 @@ public class DefaultFeignConfig {
     }
 
     @Bean
-    public ItemClientFallbackFactory itemClientFallbackFactory() {
-        return new ItemClientFallbackFactory();
+    public ItemClientFallback itemClientFallback() {
+        return new ItemClientFallback();
     }
-
 }

@@ -14,6 +14,7 @@ import org.apache.ibatis.annotations.Update;
  * @since 2023-05-05
  */
 public interface UserMapper extends BaseMapper<User> {
+
     @Update("update user set balance = balance - ${totalFee} where id = #{userId}")
     void updateMoney(@Param("userId") Long userId, @Param("totalFee") Integer totalFee);
 }

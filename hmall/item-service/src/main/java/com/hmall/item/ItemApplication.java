@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @MapperScan("com.hmall.item.mapper")
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients("com.hmall.api.client")
 @SpringBootApplication
 public class ItemApplication {
     public static void main(String[] args) {
