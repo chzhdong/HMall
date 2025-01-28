@@ -1,7 +1,6 @@
 package com.hmall.trade.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hmall.api.client.CartClient;
 import com.hmall.api.client.ItemClient;
 import com.hmall.common.exception.BadRequestException;
 import com.hmall.common.utils.UserContext;
@@ -18,13 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.hmall.api.client.ItemClient;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,9 +36,9 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
     private final ItemClient itemClient;
-    private final CartClient cartClient;
-    private final IOrderDetailService detailService;
     private final RabbitTemplate rabbitTemplate;
+    private final IOrderDetailService detailService;
+
 
     @Override
     @Transactional
@@ -58,6 +53,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Set<Long> itemIds = itemNumMap.keySet();
         // 1.3.查询商品
         List<ItemDTO> items = itemClient.queryItemsByIds(itemIds);
+
+        try {
+            rabbitTemplate.convertAndSend("item.direct", "deduct.stock", detailDTOS);
+        } catch (Exception e) {
+            log.error("清理库存失败，库存不足！", e);
+        }
         if (items == null || items.size() < itemIds.size()) {
             throw new BadRequestException("商品不存在");
         }
@@ -80,17 +81,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 3.清理购物车商品
         try{
-            rabbitTemplate.convertAndSend("trade.topic", "order.create" ,itemIds);
+            rabbitTemplate.convertAndSend("cart.direct", "create.order" ,itemIds);
         } catch (Exception e) {
             log.error("清除购物车商品失败，商品ID：{}", itemIds);
         }
-        // cartClient.deleteCartItemByIds(itemIds);
 
         // 4.扣减库存
         try {
-            itemClient.deductStock(detailDTOS);
+            rabbitTemplate.convertAndSend("item.direct", "deduct.stock", detailDTOS);
         } catch (Exception e) {
-            throw new RuntimeException("库存不足！");
+            log.error("清理库存失败，库存不足！", e);
         }
         return order.getId();
     }

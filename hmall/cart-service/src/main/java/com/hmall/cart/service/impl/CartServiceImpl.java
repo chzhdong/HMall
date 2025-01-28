@@ -17,12 +17,11 @@ import com.hmall.cart.domain.vo.CartVO;
 import com.hmall.cart.service.ICartService;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

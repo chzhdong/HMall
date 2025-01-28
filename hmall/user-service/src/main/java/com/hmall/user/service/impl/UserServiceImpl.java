@@ -14,6 +14,7 @@ import com.hmall.user.service.IUserService;
 import com.hmall.user.utils.JwtTool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -32,10 +33,9 @@ import com.hmall.user.domain.dto.LoginFormDTO;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
     private final PasswordEncoder passwordEncoder;
-
     private final JwtTool jwtTool;
-
     private final JwtProperties jwtProperties;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public UserLoginVO login(LoginFormDTO loginDTO) {

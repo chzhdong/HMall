@@ -17,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.hmall.api.client.UserClient;
-import com.hmall.api.client.OrderClient;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -37,8 +35,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
 
-    private final UserClient userClient;
-    private final OrderClient orderClient;
     private final RabbitTemplate rabbitTemplate;
 
     @Override
@@ -64,22 +60,18 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             Map<String, Object> msg = new HashMap<>();
             msg.put("pw", payOrderFormDTO.getPw());
             msg.put("amount", po.getAmount());
-            log.info(payOrderFormDTO.getPw());
-            log.info(po.getAmount().toString());
-            rabbitTemplate.convertAndSend("user.direct", "money.deduct", msg);
+            rabbitTemplate.convertAndSend("user.direct", "deduct.money", msg);
         } catch (Exception e) {
             log.error("扣减余额失败！", e);
         }
-        // userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
         // 4.修改支付单状态
         boolean success = markPayOrderSuccess(payOrderFormDTO.getId(), LocalDateTime.now());
         if (!success) {
             throw new BizIllegalException("交易已支付或关闭！");
         }
         // 5.修改订单状态
-        // orderClient.markOrderPaySuccess(po.getBizOrderNo());
         try {
-            rabbitTemplate.convertAndSend("trade.direct", "pay.success", po.getBizOrderNo());
+            rabbitTemplate.convertAndSend("order.direct", "pay.success", po.getBizOrderNo());
         } catch (Exception e) {
             log.error("支付成功的消息发送失败，支付单id：{}， 交易单id：{}", po.getId(), po.getBizOrderNo(), e);
         }
