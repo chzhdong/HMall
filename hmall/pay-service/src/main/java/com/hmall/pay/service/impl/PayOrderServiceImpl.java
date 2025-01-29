@@ -132,6 +132,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         payOrder.setBizUserId(UserContext.getUser());
         return payOrder;
     }
+
     public PayOrder queryByBizOrderNo(Long bizOrderNo) {
         return lambdaQuery()
                 .eq(PayOrder::getBizOrderNo, bizOrderNo)

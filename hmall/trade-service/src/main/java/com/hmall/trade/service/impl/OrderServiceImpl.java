@@ -2,7 +2,9 @@ package com.hmall.trade.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.api.client.ItemClient;
+import com.hmall.api.client.PayClient;
 import com.hmall.common.exception.BadRequestException;
+import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.UserContext;
 import com.hmall.api.dto.ItemDTO;
 import com.hmall.api.dto.OrderDetailDTO;
@@ -38,6 +40,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final ItemClient itemClient;
     private final RabbitTemplate rabbitTemplate;
     private final IOrderDetailService detailService;
+    private final PayClient payClient;
 
 
     @Override
@@ -92,6 +95,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         } catch (Exception e) {
             log.error("清理库存失败，库存不足！", e);
         }
+
+        try{
+            rabbitTemplate.convertAndSend("delay.direct", "delay", order.getId(),
+                    message -> {
+                        message.getMessageProperties().setDelay(10000);
+                        return message;
+                    });
+        } catch (Exception e) {
+            log.error("发送延迟消息失败", e);
+        }
         return order.getId();
     }
 
@@ -118,5 +131,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             details.add(detail);
         }
         return details;
+    }
+
+    @Override
+    public void cancelOrder(Long orderId) {
+        lambdaUpdate()
+                .eq(Order::getId, orderId)
+                .set(Order::getStatus, 5)
+                .update();
+        List<OrderDetail> list = detailService.lambdaQuery().eq(OrderDetail::getOrderId, orderId).list();
+        List<OrderDetailDTO> orderDetails = BeanUtils.copyList(list, OrderDetailDTO.class);
+        itemClient.restoreStock(orderDetails);
     }
 }

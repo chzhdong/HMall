@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.heima</groupId>
-            <artifactId>hm-feign</artifactId>
+            <artifactId>hm-api</artifactId>
             <version>1.0.0</version>
         </dependency>
         <!--web-->

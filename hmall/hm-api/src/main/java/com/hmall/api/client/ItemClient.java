@@ -18,4 +18,7 @@ public interface ItemClient {
 
     @GetMapping("/items")
     List<ItemDTO> queryItemsByIds(@RequestParam("ids") Collection<Long> ids);
+
+    @PutMapping("/items/stock/restore")
+    void restoreStock(@RequestBody List<OrderDetailDTO> orderDetails);
 }
